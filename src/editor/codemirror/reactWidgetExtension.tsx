@@ -73,6 +73,7 @@ function createWidget(node: any, createPortal: PortalFactory): Decoration {
 
 // Iterates through the syntax tree, finding occurences of SoundEffect ArgList, and places toy widget there
 export const reactWidgetExtension = (
+  view: EditorView,
   createPortal: PortalFactory
 ): Extension => {
   const decorate = (state: EditorState) => {
