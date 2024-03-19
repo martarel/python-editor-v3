@@ -86,18 +86,36 @@ export const reactWidgetExtension = (
     //let t = state.doc.toString()
     //console.log(t);
     let setpix = false;
-
+    let image = false;
     syntaxTree(state).iterate({
       from, to,
-      enter: (node: any) => { // TODO: type is SyntaxNode?
-        //console.log();
+      enter: (ref) => { // TODO: type is SyntaxNode?
+        console.log(ref.name);
         //if(node.name === "Boolean") widgets.push(createWidget(node.from, node.to, createPortal).range(node.to));
 
         // Found ArgList, will begin to parse nodes 
-        if(setpix && node.name === "ArgList") widgets.push(createWidget(node.from, node.to, createPortal).range(node.to));
+        if(setpix && ref.name === "ArgList") {
+          let c = ref.node.firstChild;
+          while(c){
+            console.log(c.name);
+            c = c ? c.nextSibling : null;
+          }
+          let cs = ref.node.getChildren("Number");
+
+          cs.forEach(
+            function (n) {
+              console.log(n.name);
+            }
+          )
+          if(cs.length === 3) widgets.push(createWidget(ref.from, ref.to, createPortal).range(ref.to));
+        }
+        if(image && ref.name === "ArgList"){
           
-        // detected SoundEffect, if next expression is an ArgList, show UI
-        setpix = node.name === "PropertyName" && state.doc.sliceString(node.from, node.to) === "set_pixel"
+        }
+
+        // detected set_pixel, if next expression is an ArgList, show UI
+        setpix = ref.name === "PropertyName" && state.doc.sliceString(ref.from, ref.to) === "set_pixel"
+        image = ref.name === "VariableName" && state.doc.sliceString(ref.from, ref.to) === "Image"
       }
     })
 
