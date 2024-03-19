@@ -110,6 +110,7 @@ export const reactWidgetExtension = (
           if(cs.length === 3) widgets.push(createWidget(ref.from, ref.to, createPortal).range(ref.to));
         }
         if(image && ref.name === "ArgList"){
+          let s = ref.node.getChild("ContinuedString");
           
         }
 
