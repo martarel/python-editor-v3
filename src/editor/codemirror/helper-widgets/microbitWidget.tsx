@@ -74,7 +74,10 @@ const MicrobitSinglePixelGrid: React.FC<MicrobitSinglePixelGridProps> = ({ onCli
   );
 };
 
-export const MicrobitSinglePixelComponent = ({ args, from, to, view }: WidgetProps<number>) => {
+export const MicrobitSinglePixelComponent = ({ props }: {props: WidgetProps<number>} ) => {
+  let args = props.args; 
+  let from = props.from; let to = props.to;
+  let view = props.view; 
   const [selectedPixel, setSelectedPixel] = useState<Pixel | null>(null);
   if (Array.isArray(args) && args.length === 3) {
     const [x, y, brightness] = args;
