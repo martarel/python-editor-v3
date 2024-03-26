@@ -115,15 +115,20 @@ export const reactWidgetExtension = (
     return Decoration.set(widgets)
   };
 
-  const stateField = StateField.define<DecorationSet>({
+  interface WInfo {
+    open : number, // -1 if no widget is open
+    widgets : DecorationSet
+  }
+  
+  const stateField = StateField.define<WInfo>({
     create(state) {
-      return decorate(state);
+      return { open:-1, widgets:decorate(state) };
     },
-    update(widgets, transaction) {
+    update(wInfo, transaction) {
       if (transaction.docChanged) {
-        return decorate(transaction.state);
+        return {open:wInfo.open, widgets:decorate(transaction.state)};
       }
-      return widgets.map(transaction.changes);
+      return {open:wInfo.open, widgets:wInfo.widgets.map(transaction.changes)};
     },
     provide(field) {
       return EditorView.decorations.from(field);
