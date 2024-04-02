@@ -42,10 +42,21 @@ const ToggleReactComponent = ({ from, to, view }: { from: number, to: number, vi
       }
     });
   }, [curVal, from, to, view]);
+  const handleClose = useCallback(() => {
+    openWidgetLoc = -1;  
+    view.dispatch({
+      changes: {
+        from: 0,
+        to: 1,
+        insert: view.state.doc.sliceString(0, 1),
+      }
+    });
+  }, []);
   return (
     <HStack fontFamily="body" spacing={5} py={3}>
       <Button onClick={handleClick}>Toggle</Button>
       <Text fontWeight="semibold">Value: {curVal}</Text>
+      <Button onClick={handleClose}>Close</Button>
     </HStack>
   );
 };
@@ -65,7 +76,10 @@ class ToggleWidget extends WidgetType {
     const dom = document.createElement("div");
 
     console.log(openWidgetLoc);
-    if(this.to != openWidgetLoc) this.portalCleanup = this.createPortal(dom, <OpenReactComponent loc={this.to} view={view} />);
+    if(this.to != openWidgetLoc) {
+      dom.style.display = 'inline-block'; // want it inline for the open-close widget
+      this.portalCleanup = this.createPortal(dom, <OpenReactComponent loc={this.to} view={view} />);
+    }
     else this.portalCleanup = this.createPortal(dom, <ToggleReactComponent from={this.from} to={this.to} view={view} />);
     return dom;
   }
@@ -91,7 +105,6 @@ export const reactWidgetExtension = (
       let deco = Decoration.widget({
         widget: new ToggleWidget(from, to, createPortal),
         side: 1,
-        block: true,
       });
     
       widgets.push(deco.range(to));
@@ -118,6 +131,7 @@ export const reactWidgetExtension = (
     update(widgets, transaction) {
       if (transaction.docChanged) {
         // update openWidgetLoc if changes moves it
+        // transaction.changes.mapPos()
         transaction.changes.iterChangedRanges((_fromA, _toA, _fromB, _toB) => {
           if(_toA <= openWidgetLoc){
             openWidgetLoc += (_toB - _fromB) - (_toA - _fromA)
@@ -131,18 +145,5 @@ export const reactWidgetExtension = (
       return EditorView.decorations.from(field);
     },
   });
-
-  // Stores location of open widget or -1 if all are closed
-  // const openWidgetState = StateField.define<number>({
-  //   create() {
-  //     return -1;
-  //   },
-  //   update(loc, transaction) {
-  //     if (transaction.docChanged) {
-  //       return loc;
-  //     }
-  //     return loc;
-  //   },
-  // })
   return [stateField];
 }
