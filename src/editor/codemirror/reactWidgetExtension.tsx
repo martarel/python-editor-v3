@@ -11,16 +11,11 @@ import { useState, useCallback } from "react";
 import { PortalFactory } from "./CodeMirror";
 
 let openWidgetLoc = -1;
+export const updateOpenWidgetEffect = StateEffect.define<number>();
 const OpenReactComponent = ({ loc, view }: { loc: number, view: EditorView }) => {
   const handleClick = useCallback(() => {
-    openWidgetLoc = loc;
-    // TODO: not sure how to force a view update without a list of changes
     view.dispatch({
-      changes: {
-        from: 0,
-        to: 1,
-        insert: view.state.doc.sliceString(0, 1),
-      }
+      effects: [updateOpenWidgetEffect.of(loc)],
     });
   }, []);
   return (
@@ -45,11 +40,7 @@ const ToggleReactComponent = ({ from, to, view }: { from: number, to: number, vi
   const handleClose = useCallback(() => {
     openWidgetLoc = -1;  
     view.dispatch({
-      changes: {
-        from: 0,
-        to: 1,
-        insert: view.state.doc.sliceString(0, 1),
-      }
+      effects: [updateOpenWidgetEffect.of(-1)],
     });
   }, []);
   return (
@@ -132,6 +123,12 @@ export const reactWidgetExtension = (
       if (transaction.docChanged) {
         // update openWidgetLoc if changes moves it
         // transaction.changes.mapPos()
+        for (let effect of transaction.effects) {
+          if (effect.is(updateOpenWidgetEffect)) {
+            openWidgetLoc = effect.value;
+          }
+        }
+
         transaction.changes.iterChangedRanges((_fromA, _toA, _fromB, _toB) => {
           if(_toA <= openWidgetLoc){
             openWidgetLoc += (_toB - _fromB) - (_toA - _fromA)
