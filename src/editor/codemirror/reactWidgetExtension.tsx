@@ -14,6 +14,7 @@ let openWidgetLoc = -1;
 export const updateOpenWidgetEffect = StateEffect.define<number>();
 const OpenReactComponent = ({ loc, view }: { loc: number, view: EditorView }) => {
   const handleClick = useCallback(() => {
+    console.log("click");
     view.dispatch({
       effects: [updateOpenWidgetEffect.of(loc)],
     });
@@ -119,16 +120,17 @@ export const reactWidgetExtension = (
       return decorate(state);
     },
     update(widgets, transaction) {
+      // check for open/close button pressed
+      for (let effect of transaction.effects) {
+        if (effect.is(updateOpenWidgetEffect)) {
+          openWidgetLoc = effect.value;
+          return decorate(transaction.state);
+        }
+      }
+      // else check for other doc edits
       if (transaction.docChanged) {
         // update openWidgetLoc if changes moves it
         // transaction.changes.mapPos()
-        for (let effect of transaction.effects) {
-          if (effect.is(updateOpenWidgetEffect)) {
-            console.log("hi");
-            openWidgetLoc = effect.value;
-          }
-        }
-
         transaction.changes.iterChangedRanges((_fromA, _toA, _fromB, _toB) => {
           if(_toA <= openWidgetLoc){
             openWidgetLoc += (_toB - _fromB) - (_toA - _fromA)
