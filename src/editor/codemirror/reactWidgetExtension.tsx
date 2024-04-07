@@ -17,7 +17,7 @@ const OpenReactComponent = ({ loc, view }: { loc: number, view: EditorView }) =>
     view.dispatch({
       effects: [updateOpenWidgetEffect.of(loc)],
     });
-  }, []);
+  }, [loc, view]);
   return (
     <HStack fontFamily="body" spacing={5} py={3}>
       <Button onClick={handleClick}>Open</Button>
@@ -38,11 +38,10 @@ const ToggleReactComponent = ({ from, to, view }: { from: number, to: number, vi
     });
   }, [curVal, from, to, view]);
   const handleClose = useCallback(() => {
-    openWidgetLoc = -1;  
     view.dispatch({
       effects: [updateOpenWidgetEffect.of(-1)],
     });
-  }, []);
+  }, [view]);
   return (
     <HStack fontFamily="body" spacing={5} py={3}>
       <Button onClick={handleClick}>Toggle</Button>
@@ -125,6 +124,7 @@ export const reactWidgetExtension = (
         // transaction.changes.mapPos()
         for (let effect of transaction.effects) {
           if (effect.is(updateOpenWidgetEffect)) {
+            console.log("hi");
             openWidgetLoc = effect.value;
           }
         }
