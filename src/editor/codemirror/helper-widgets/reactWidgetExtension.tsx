@@ -40,6 +40,11 @@ class Widget extends WidgetType {
     super();
   }
 
+  eq(other: WidgetType): boolean {
+    const them = other as Widget;
+    return them.component === this.component && them.props === this.props;
+  }
+
   toDOM(view: EditorView) {
     const dom = document.createElement("div");
 
