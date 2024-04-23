@@ -42,7 +42,10 @@ class Widget extends WidgetType {
 
   eq(other: WidgetType): boolean {
     const them = other as Widget;
-    return them.component === this.component && them.props.to === this.props.to && them.inline === this.inline;
+    let args1 = this.props.args; let args2 = them.props.args;
+    let eqArgs = args1.length === args2.length && args1.every((element, index) => element === args2[index]);
+
+    return them.component === this.component && them.props.to === this.props.to && eqArgs && them.inline === this.inline;
   }
 
   toDOM(view: EditorView) {
