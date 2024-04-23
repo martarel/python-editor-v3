@@ -42,6 +42,8 @@ class Widget extends WidgetType {
 
   eq(other: WidgetType): boolean {
     const them = other as Widget;
+    console.log(them.component === this.component);
+    console.log(them.props === this.props);
     return them.component === this.component && them.props === this.props;
   }
 
