@@ -25,7 +25,7 @@ export interface WidgetProps {
 }
 
 /**
- * Ths widget will have its contents rendered by the code in CodeMirror.tsx
+ * This widget will have its contents rendered by the code in CodeMirror.tsx
  * which it communicates with via the portal factory.
  */
 class Widget extends WidgetType {
